@@ -1,6 +1,4 @@
 package com.chatapp.controller;
-
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +22,7 @@ public class RoomController {
 	@Autowired
 	private RoomRepository roomRepository;
 
-	@PostMapping("/create")
+	@PostMapping
 	ResponseEntity<?> createRoom(@RequestBody String roomId) {
 		if (roomRepository.findByRoomId(roomId) != null) {
 			//room is already exists
@@ -39,7 +37,7 @@ public class RoomController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(room);
 	}
 	
-	@GetMapping("{/roomId}")
+	@GetMapping("/{roomId}")
 	ResponseEntity<?> joinRoom(@PathVariable String roomId) {
 		
 		Room room = roomRepository.findByRoomId(roomId);
@@ -65,10 +63,17 @@ public class RoomController {
 		}
 		
 		//get messages 
+		List<Message> messages = room.getMessages();
 		
 		//pagination
 		
-		List<Message> messages = new ArrayList<>();
-		return ResponseEntity.ok(messages);
+		int start = Math.max(0,messages.size() - (page + 1) * size);
+		
+		int end = Math.min(messages.size(), start + size);
+		
+		List<Message> paginatedMessages = messages.subList(start, end);
+		
+		
+		return ResponseEntity.ok(paginatedMessages);
 	}
 }
