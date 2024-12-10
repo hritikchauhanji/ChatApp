@@ -1,4 +1,4 @@
-// import React from "react";
+import React from "react";
 import ChatIcon from "../assets/chat.png";
 const JoinChatApp = () => {
   return (
