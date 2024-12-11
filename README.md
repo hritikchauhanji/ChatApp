@@ -1,3 +1,3 @@
-This is room based chat application.
-In this application create a room and join the chat talk to ech other.
-Thankyou...
+This is based on a room chat application.
+In this application create a room and join the chat to talk to each other.
+Thank you...
