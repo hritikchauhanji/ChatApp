@@ -1,93 +1,136 @@
-import React from "react";
+import React, { useEffect } from "react";
 
 import { useRef, useState } from "react";
 import { MdAttachFile, MdSend } from "react-icons/md";
-
+import useChatContext from "../context/ChatContext";
+import { useNavigate } from "react-router";
+import SockJS from "sockjs-client";
+import { baseUrl } from "../config/AxiosHelper";
+import { Stomp } from "@stomp/stompjs";
+import toast from "react-hot-toast";
+import { getMessages } from "../services/RoomServices";
+import { timeAgo } from "../config/Helper";
 const ChatPages = () => {
-  const [messages, setMessages] = useState([
-    {
-      content: "How are you ?",
-      sender: "Mayank",
-    },
-    {
-      content: "How are you ?",
-      sender: "Hritik",
-    },
-    {
-      content: "How are you ?",
-      sender: "Hritik",
-    },
-    {
-      content: "How are you ?",
-      sender: "Mayank",
-    },
-    {
-      content: "How are you ?",
-      sender: "Hritik",
-    },
-    {
-      content: "How are you ?",
-      sender: "Mayank",
-    },
-    {
-      content: "How are you ?",
-      sender: "Hritik",
-    },
-    {
-      content: "How are you ?",
-      sender: "Hritik",
-    },
-    {
-      content: "How are you ?",
-      sender: "Mayank",
-    },
-    {
-      content: "How are you ?",
-      sender: "Hritik",
-    },
-    {
-      content: "How are you ?",
-      sender: "Mayank",
-    },
-    {
-      content: "How are you ?",
-      sender: "Hritik",
-    },
-    {
-      content: "How are you ?",
-      sender: "Hritik",
-    },
-    {
-      content: "How are you ?",
-      sender: "Mayank",
-    },
-    {
-      content: "How are you ?",
-      sender: "Hritik",
-    },
-  ]);
+  const {
+    roomId,
+    currentUser,
+    connected,
+    setRoomId,
+    setCurrentUser,
+    setConnected,
+  } = useChatContext();
+  // console.log(roomId);
+  // console.log(currentUser);
+  // console.log(connected);
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (!connected) {
+      navigate("/");
+    }
+  }, [roomId, currentUser, connected]);
+  const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const inputRef = useRef(null);
   const chatBoxRef = useRef(null);
   const [stompClient, setStompClient] = useState(null);
-  const [roomId, setRoomId] = useState("");
-  const [currentUser] = useState("Hritik");
+
+  // scroll
+
+  useEffect(() => {
+    if (chatBoxRef.current) {
+      chatBoxRef.current.scroll({
+        top: chatBoxRef.current.scrollHeight,
+        behavior: "smooth",
+      });
+    }
+  }, [messages]);
+
+  useEffect(() => {
+    async function loadMessages() {
+      try {
+        const messages = await getMessages(roomId);
+        // console.log(messages);
+        setMessages(messages);
+      } catch (error) {}
+    }
+    if (connected) {
+      loadMessages();
+    }
+  }, []);
+
+  useEffect(() => {
+    const connectWebSocket = () => {
+      const sock = new SockJS(`${baseUrl}/chat`);
+
+      const client = Stomp.over(sock);
+      client.connect({}, () => {
+        setStompClient(client);
+        toast.success("connected");
+        client.subscribe(`/topic/room/${roomId}`, (message) => {
+          console.log(message);
+          const newMessage = JSON.parse(message.body);
+          setMessages((prev) => [...prev, newMessage]);
+        });
+      });
+    };
+    if (connected) {
+      connectWebSocket();
+    }
+  }, [roomId]);
+
+  const sendMessages = async () => {
+    if (stompClient && connected && input.trim()) {
+      console.log(input);
+
+      const message = {
+        sender: currentUser,
+        content: input,
+        roomId: roomId,
+      };
+
+      stompClient.send(
+        `/app/sendMessage/${roomId}`,
+        {},
+        JSON.stringify(message)
+      );
+      setInput("");
+    }
+  };
+
+  function handleLogout() {
+    stompClient.disconnect();
+    setConnected(false);
+    setRoomId("");
+    setConnected("");
+    navigate("/");
+  }
+
   return (
     <div className="">
       {/* {header section} */}
       <header className="fixed flex items-center justify-around w-full py-4 shadow dark:border-gray-700 dark:bg-gray-800">
         {/* {roomId} */}
-        <div>RoomId : family-group</div>
+        <div>
+          RoomId : <span>{roomId}</span>
+        </div>
         {/* {user} */}
-        <div>User : Mayank Chauhan</div>
+        <div>
+          User : <span>{currentUser}</span>
+        </div>
         {/* {leave room} */}
         <div>
-          <button className="px-3 py-2 font-semibold rounded-lg dark:bg-red-600 hover:dark:bg-red-700">
+          <button
+            onClick={handleLogout}
+            className="px-3 py-2 font-semibold rounded-lg dark:bg-red-600 hover:dark:bg-red-700"
+          >
             Leave Room
           </button>
         </div>
       </header>
-      <main className="w-2/3 h-screen px-10 py-20 mx-auto overflow-auto dark:bg-slate-600">
+      <main
+        ref={chatBoxRef}
+        className="w-2/3 h-screen px-10 py-20 mx-auto overflow-auto dark:bg-slate-600"
+      >
         {messages.map((message, index) => (
           <div
             key={index}
@@ -105,9 +148,26 @@ const ChatPages = () => {
                   src="https://avatar.iran.liara.run/public"
                   className="w-10 h-10"
                 />
-                <div className="flex flex-col gap-1">
+                <div className="flex flex-col gap-1 py-1">
+                  <p
+                    className={`text-xs ${
+                      message.sender === currentUser
+                        ? "text-green-500"
+                        : "text-gray-300"
+                    } `}
+                  >
+                    {message.sender}
+                  </p>
                   <p>{message.content}</p>
-                  <p>{message.sender}</p>
+                  <p
+                    className={`text-[10px]  ${
+                      message.sender === currentUser
+                        ? "text-green-600"
+                        : "text-gray-400"
+                    } `}
+                  >
+                    {timeAgo(message.timeStamp)}
+                  </p>
                 </div>
               </div>
             </div>
@@ -118,7 +178,16 @@ const ChatPages = () => {
       <div className="fixed bottom-0 w-full h-16">
         <div className="flex items-center justify-between w-2/5 h-full gap-5 px-5 mx-auto rounded-full dark:bg-gray-800 dark:border-gray-700">
           <input
+            value={input}
+            onChange={(e) => {
+              setInput(e.target.value);
+            }}
             type="text"
+            onKeyDown={(e) => {
+              if (e.key == "Enter") {
+                sendMessages();
+              }
+            }}
             placeholder="Type your message here..."
             className="w-full px-3 py-2 rounded-lg dark:bg-gray-800 focus:outline-none"
           />
@@ -126,7 +195,10 @@ const ChatPages = () => {
             <button className="flex items-center justify-center w-10 h-10 rounded-full dark:bg-gray-700 hover:dark:bg-gray-600">
               <MdAttachFile size={25} />
             </button>
-            <button className="flex items-center justify-center w-10 h-10 rounded-full dark:bg-green-700 hover:dark:bg-green-600">
+            <button
+              onClick={sendMessages}
+              className="flex items-center justify-center w-10 h-10 rounded-full dark:bg-green-700 hover:dark:bg-green-600"
+            >
               <MdSend size={25} />
             </button>
           </div>
