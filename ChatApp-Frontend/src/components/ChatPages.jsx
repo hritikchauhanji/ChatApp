@@ -97,6 +97,21 @@ const ChatPages = () => {
     }
   };
 
+  useEffect(() => {
+    setTimeout(() => {
+      inputRef.current?.focus();
+    }, 0);
+  }, []);
+
+  const handleKeyDown = (event) => {
+    if (document.activeElement === inputRef.current?.focus()) {
+      if (event.key.length === 1) {
+        // Append the pressed key to the input value
+        setInput((prev) => prev + event.key);
+      }
+    }
+  };
+
   function handleLogout() {
     stompClient.disconnect();
     setConnected(false);
@@ -183,10 +198,17 @@ const ChatPages = () => {
               setInput(e.target.value);
             }}
             type="text"
+            ref={inputRef}
             onKeyDown={(e) => {
-              if (e.key == "Enter") {
+              if (e.key === "Enter") {
                 sendMessages();
               }
+            }}
+            onFocus={() => {
+              window.addEventListener("keydown", handleKeyDown); // Attach keydown listener
+            }}
+            onBlur={() => {
+              window.removeEventListener("keydown", handleKeyDown); // Remove listener when blurred
             }}
             placeholder="Type your message here..."
             className="w-full px-3 py-2 rounded-lg dark:bg-gray-800 focus:outline-none"
