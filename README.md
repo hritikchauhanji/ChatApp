@@ -1,1 +1,3 @@
-# ChatApp
+This is room based chat application.
+In this application create a room and join the chat talk to ech other.
+Thankyou...
