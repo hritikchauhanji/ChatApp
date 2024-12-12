@@ -13,12 +13,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.chatapp.config.AppConstants;
 import com.chatapp.entities.Message;
 import com.chatapp.entities.Room;
 import com.chatapp.repository.RoomRepository;
 @RestController
 @RequestMapping("api/v1/rooms")
-@CrossOrigin("http://localhost:5173")
+@CrossOrigin(AppConstants.Frontend_Base_URL)
 public class RoomController {
 	
 	@Autowired
