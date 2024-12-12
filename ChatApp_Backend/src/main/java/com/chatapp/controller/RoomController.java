@@ -19,7 +19,7 @@ import com.chatapp.entities.Room;
 import com.chatapp.repository.RoomRepository;
 @RestController
 @RequestMapping("api/v1/rooms")
-@CrossOrigin(AppConstants.Frontend_Base_URL)
+@CrossOrigin(origins =  AppConstants.Frontend_Base_URL)
 public class RoomController {
 	
 	@Autowired
