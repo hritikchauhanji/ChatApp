@@ -25,7 +25,7 @@ public class RoomController {
 	@Autowired
 	private RoomRepository roomRepository;
 
-	@PostMapping
+	@PostMapping("/save")
 	ResponseEntity<?> createRoom(@RequestBody String roomId) {
 		if (roomRepository.findByRoomId(roomId) != null) {
 			//room is already exists
