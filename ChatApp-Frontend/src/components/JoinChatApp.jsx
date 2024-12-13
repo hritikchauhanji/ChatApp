@@ -78,7 +78,7 @@ const JoinChatApp = () => {
 
   return (
     <div className="flex items-center justify-center min-h-screen">
-      <div className="flex flex-col w-full max-w-md gap-5 p-8 rounded-xl dark:bg-gray-800">
+      <div className="flex flex-col w-full max-w-md gap-5 p-8 mx-2 sm:mx-0 rounded-xl dark:bg-gray-800">
         <img src={ChatIcon} className="w-24 mx-auto" />
         <h1 className="text-2xl font-semibold text-center">
           Join Room / Create Room...

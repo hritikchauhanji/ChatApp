@@ -144,7 +144,7 @@ const ChatPages = () => {
       </header>
       <main
         ref={chatBoxRef}
-        className="w-2/3 h-screen px-10 py-20 mx-auto overflow-auto dark:bg-slate-600"
+        className="h-screen px-10 py-20 mx-auto overflow-auto sm:w-2/3 dark:bg-slate-600"
       >
         {messages.map((message, index) => (
           <div
@@ -190,8 +190,8 @@ const ChatPages = () => {
         ))}
       </main>
       {/* {message input section} */}
-      <div className="fixed bottom-0 w-full h-16">
-        <div className="flex items-center justify-between w-2/5 h-full gap-5 px-5 mx-auto rounded-full dark:bg-gray-800 dark:border-gray-700">
+      <div className="fixed w-full h-16 bottom-2">
+        <div className="flex items-center justify-between h-full gap-5 px-5 mx-2 rounded-full sm:mx-auto md:w-2/5 sm:w-3/5 dark:bg-gray-800 dark:border-gray-700">
           <input
             value={input}
             onChange={(e) => {
@@ -211,7 +211,7 @@ const ChatPages = () => {
               window.removeEventListener("keydown", handleKeyDown); // Remove listener when blurred
             }}
             placeholder="Type your message here..."
-            className="w-full px-3 py-2 rounded-lg dark:bg-gray-800 focus:outline-none"
+            className="w-full px-3 py-2 rounded-lg placeholder:text-xs sm:placeholder:text-sm dark:bg-gray-800 focus:outline-none"
           />
           <div className="flex items-center justify-center gap-5">
             <button className="flex items-center justify-center w-10 h-10 rounded-full dark:bg-gray-700 hover:dark:bg-gray-600">
