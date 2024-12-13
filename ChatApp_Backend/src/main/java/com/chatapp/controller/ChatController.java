@@ -16,7 +16,7 @@ import com.chatapp.payload.MessageRequest;
 import com.chatapp.repository.RoomRepository;
 
 @Controller
-@CrossOrigin(AppConstants.Frontend_Base_URL)
+//@CrossOrigin(AppConstants.Frontend_Base_URL)
 public class ChatController {
 
 	private RoomRepository roomRepository;
