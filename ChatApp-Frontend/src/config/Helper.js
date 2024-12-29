@@ -2,7 +2,7 @@
 export function timeAgo(timestamp) {
   const now = new Date();
   const time = new Date(timestamp);
-  const seconds = Math.floor((now - time) / 1000);
+  const seconds = Math.floor((now.getTime() - time.getTime()) / 1000);
 
   const intervals = [
     { label: "year", seconds: 31536000 },
