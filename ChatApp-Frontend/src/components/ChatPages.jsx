@@ -9,7 +9,7 @@ import { baseUrl } from "../config/AxiosHelper";
 import { Stomp } from "@stomp/stompjs";
 import toast from "react-hot-toast";
 import { getMessages } from "../services/RoomServices";
-import { timeAgo } from "../config/Helper";
+import { formatTimeWithAMPM } from "../config/Helper";
 const ChatPages = () => {
   const {
     roomId,
@@ -181,7 +181,7 @@ const ChatPages = () => {
                         : "text-gray-400"
                     } `}
                   >
-                    {timeAgo(message.timeStamp)}
+                    {formatTimeWithAMPM(message.timeStamp)}
                   </p>
                 </div>
               </div>
